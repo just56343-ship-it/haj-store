@@ -1,0 +1,100 @@
+{
+  "users": {
+    "user_1": {
+      "id": "user_1",
+      "name": "hala ahmed",
+      "email": "hala ahmed",
+      "password": "$2a$10$WiWdQ/0OSfqw/K7/B21ZoONCbJmYiakjaaokpDBP8uBnrKjBwJ3OC",
+      "address": "",
+      "phone": "",
+      "orders": [
+        "order_2",
+        "order_3"
+      ],
+      "cart": [],
+      "role": "user",
+      "createdAt": "2026-05-02T09:27:25.279Z"
+    },
+    "user_4": {
+      "id": "user_4",
+      "name": "hala ahmed",
+      "email": "lolahmed@gmail.com",
+      "password": "$2a$10$J/OffoHsdQG/sZvL7h0PsO6d3ShLdNebDzzHcMyZJ1LRffEixn/aG",
+      "address": "",
+      "phone": "",
+      "orders": [],
+      "cart": [],
+      "role": "user",
+      "createdAt": "2026-05-02T09:55:04.600Z"
+    },
+    "user_5": {
+      "id": "user_5",
+      "name": "hala",
+      "email": "jhag@gmail.com",
+      "password": "$2a$10$5DKYCGrGgzQszfsR4czti.4qU2h0OkhS.wc84qGDSa5IyBURf9.8W",
+      "address": "",
+      "phone": "",
+      "orders": [],
+      "cart": [],
+      "role": "user",
+      "createdAt": "2026-05-02T10:17:23.123Z"
+    }
+  },
+  "orders": {
+    "order_2": {
+      "id": "order_2",
+      "user": "user_1",
+      "items": [
+        {
+          "name": "STAN HIJAB",
+          "price": 299,
+          "quantity": 1,
+          "image": "stan2.jpg"
+        }
+      ],
+      "totalAmount": 299,
+      "shippingInfo": {
+        "fullName": "hala ahmed",
+        "phone": "01201326563",
+        "address": "/",
+        "notes": ""
+      },
+      "paymentMethod": "cash",
+      "paymentStatus": "pending",
+      "orderStatus": "pending",
+      "orderNumber": "HAJ-222622-995",
+      "createdAt": "2026-05-02T09:30:22.622Z"
+    },
+    "order_3": {
+      "id": "order_3",
+      "user": "user_1",
+      "items": [
+        {
+          "name": "STAN HIJAB",
+          "price": 299,
+          "quantity": 1,
+          "image": "stan2.jpg"
+        },
+        {
+          "name": "STAN HIJAB",
+          "price": 299,
+          "quantity": 1,
+          "image": "stan2.jpg"
+        }
+      ],
+      "totalAmount": 598,
+      "shippingInfo": {
+        "fullName": "hala ahmed",
+        "phone": "01201326563",
+        "address": "نتن",
+        "notes": ""
+      },
+      "paymentMethod": "cash",
+      "paymentStatus": "pending",
+      "orderStatus": "pending",
+      "orderNumber": "HAJ-733682-237",
+      "createdAt": "2026-05-02T09:38:53.682Z"
+    }
+  },
+  "nextId": 6
+}
