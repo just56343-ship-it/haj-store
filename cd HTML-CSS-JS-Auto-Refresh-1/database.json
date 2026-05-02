@@ -38,6 +38,54 @@
       "cart": [],
       "role": "user",
       "createdAt": "2026-05-02T10:17:23.123Z"
+    },
+    "user_6": {
+      "id": "user_6",
+      "name": "hala ahmed",
+      "email": "lolahd@gmail.com",
+      "password": "$2a$10$gg7DOOXLiaV.nU.4vzr/7uTb5.5aJUQdlE1Hyzy252W7jl4QdKYny",
+      "address": "",
+      "phone": "",
+      "orders": [],
+      "cart": [],
+      "role": "user",
+      "createdAt": "2026-05-02T17:02:15.152Z"
+    },
+    "user_7": {
+      "id": "user_7",
+      "name": "hala ahmed",
+      "email": "lolmed@gmail.com",
+      "password": "$2a$10$.8skejuQfJpC9/FQtTzbUeZBv8IIwvzosdTHrCAtCiC5lkIa/qrlm",
+      "address": "",
+      "phone": "",
+      "orders": [],
+      "cart": [],
+      "role": "user",
+      "createdAt": "2026-05-02T17:05:26.111Z"
+    },
+    "user_8": {
+      "id": "user_8",
+      "name": "halaa",
+      "email": "jg@gmail.com",
+      "password": "$2a$10$24X.9IyD81T4H92iSKudeuF0/T/RAoyD1KWME24O3irvQxBC.h6ke",
+      "address": "",
+      "phone": "",
+      "orders": [],
+      "cart": [],
+      "role": "user",
+      "createdAt": "2026-05-02T17:08:12.570Z"
+    },
+    "user_9": {
+      "id": "user_9",
+      "name": "hala ahmed",
+      "email": "lolahm@gmail.com",
+      "password": "$2a$10$QW3O76UKkqLZe86VyRP9Mu2FjWbAQUJwocpbeeZsVeiBRCEEJwP8m",
+      "address": "",
+      "phone": "",
+      "orders": [],
+      "cart": [],
+      "role": "user",
+      "createdAt": "2026-05-02T17:40:49.180Z"
     }
   },
   "orders": {
@@ -96,5 +144,5 @@
       "createdAt": "2026-05-02T09:38:53.682Z"
     }
   },
-  "nextId": 6
+  "nextId": 10
 }

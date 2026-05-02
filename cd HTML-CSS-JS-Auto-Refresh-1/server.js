@@ -8,9 +8,12 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = 'haj-secret-key-2025';
 
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  credentials: true
+}));
 app.use(express.json());
-app.use(express.static('.'));
+app.use(express.static('public'));
 
 const DB_FILE = './database.json';
 
@@ -49,7 +52,6 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-// Register
 app.post('/api/auth/register', (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -87,7 +89,6 @@ app.post('/api/auth/register', (req, res) => {
   }
 });
 
-// Login
 app.post('/api/auth/login', (req, res) => {
   try {
     const { email, password } = req.body;
@@ -116,7 +117,6 @@ app.post('/api/auth/login', (req, res) => {
   }
 });
 
-// Get Me
 app.get('/api/auth/me', authMiddleware, (req, res) => {
   try {
     const user = req.user;
@@ -131,7 +131,6 @@ app.get('/api/auth/me', authMiddleware, (req, res) => {
   }
 });
 
-// Update Profile
 app.put('/api/auth/profile', authMiddleware, (req, res) => {
   try {
     const { name, address, phone } = req.body;
@@ -147,7 +146,6 @@ app.put('/api/auth/profile', authMiddleware, (req, res) => {
   }
 });
 
-// Products
 const allProducts = [
   { id: '1', name: 'Chiffon hijab with attached inner cap', price: 120, images: ['jel8.jpg','jel3.jpg','jel4.jpg','jel5.jpg','jel6.jpg','jel7.jpg'], category: 'chiffon', isBestSeller: true },
   { id: '2', name: 'FLOWERS HIJAB', price: 180, images: ['m2.jpg','m3.jpg','m4.jpg','m5.jpg','m6.jpg','m7.jpg'], category: 'flowers', isBestSeller: true },
@@ -166,17 +164,16 @@ app.get('/api/products', (req, res) => {
   res.json({ success: true, count: products.length, products });
 });
 
+app.get('/api/products/bestsellers/list', (req, res) => {
+  res.json({ success: true, products: allProducts.filter(p => p.isBestSeller).slice(0, 3) });
+});
+
 app.get('/api/products/:id', (req, res) => {
   const product = allProducts.find(p => p.id === req.params.id);
   if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
   res.json({ success: true, product });
 });
 
-app.get('/api/products/bestsellers/list', (req, res) => {
-  res.json({ success: true, products: allProducts.filter(p => p.isBestSeller).slice(0, 3) });
-});
-
-// Cart
 app.get('/api/cart', authMiddleware, (req, res) => {
   res.json({ success: true, cart: req.user.cart || [] });
 });
@@ -186,11 +183,9 @@ app.post('/api/cart', authMiddleware, (req, res) => {
   const db = readDB();
   const user = db.users[req.userId];
   if (!user.cart) user.cart = [];
-  
   const existing = user.cart.find(item => item.product === productId);
   if (existing) existing.quantity += quantity || 1;
   else user.cart.push({ product: productId, quantity: quantity || 1, selectedImage });
-  
   writeDB(db);
   res.json({ success: true, cart: user.cart });
 });
@@ -210,7 +205,6 @@ app.delete('/api/cart', authMiddleware, (req, res) => {
   res.json({ success: true, cart: [] });
 });
 
-// Orders
 app.post('/api/orders', authMiddleware, (req, res) => {
   const { items, shippingInfo, paymentMethod } = req.body;
   if (!items || !items.length) return res.status(400).json({ success: false, message: 'Cart is empty' });

@@ -1,14 +1,12 @@
 /* ═══════════════════════════════════════════
    API Configuration
 ═══════════════════════════════════════════ */
-const API_URL = 'http://localhost:3000'; // Backend server
- 
-// Helper: Get auth token
+const API_URL = 'http://localhost:3000';
+
 function getToken() {
   return localStorage.getItem('token');
 }
- 
-// Helper: API request
+
 async function apiRequest(endpoint, options = {}) {
   const url = `${API_URL}/api${endpoint}`;
   const headers = {
@@ -21,18 +19,29 @@ async function apiRequest(endpoint, options = {}) {
     headers['Authorization'] = `Bearer ${token}`;
   }
   
-  const res = await fetch(url, {
-    ...options,
-    headers
-  });
-  
-  const data = await res.json();
-  if (!data.success && res.status !== 200) {
-    throw new Error(data.message || 'Request failed');
+  try {
+    const res = await fetch(url, {
+      ...options,
+      headers
+    });
+    
+    const contentType = res.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await res.text();
+      throw new Error(`Server returned non-JSON: ${text.substring(0, 100)}`);
+    }
+    
+    const data = await res.json();
+    if (!data.success) {
+      throw new Error(data.message || 'Request failed');
+    }
+    return data;
+  } catch (e) {
+    console.error('API Error:', e);
+    throw e;
   }
-  return data;
 }
- 
+
 /* ═══════════════════════════════════════════
    بيانات المنتجات (Fallback)
 ═══════════════════════════════════════════ */
@@ -44,7 +53,7 @@ const allProducts = [
   { id:5, name:'MILT HIJAB',     price:'150', imgs:['c1.jpg','c2.jpg','c4.jpg','c3.jpg','c5.jpg','c6.jpg'] },
   { id:6, name:'TIGER HIJAB',    price:'200', imgs:['d1.jpg','d2.jpg','d3.jpg','d5.jpg','d7.jpg'] },
 ];
- 
+
 /* ═══════════════════════════════════════════
    بناء الصفحات
 ═══════════════════════════════════════════ */
@@ -66,7 +75,7 @@ async function buildNewCollection() {
   }
   renderProducts(allProducts);
 }
- 
+
 async function buildBestSellers() {
   try {
     const data = await apiRequest('/products/bestsellers/list');
@@ -85,7 +94,7 @@ async function buildBestSellers() {
   }
   renderBestSellers(allProducts.slice(0,3));
 }
- 
+
 function renderBestSellers(products) {
   document.getElementById('best-sellers-container').innerHTML =
     products.map(p => `
@@ -96,7 +105,7 @@ function renderBestSellers(products) {
       </div>
     `).join('');
 }
- 
+
 function renderProducts(products) {
   document.getElementById('nc-products-container').innerHTML =
     products.map(p => `
@@ -122,34 +131,33 @@ function renderProducts(products) {
     card.querySelector('.nc-thumb').classList.add('active');
   });
 }
- 
-// شغل البناء أول ما الصفحة تفتح
+
 buildNewCollection();
 buildBestSellers();
- 
+
 /* ═══════════════════════════════════════════
    Search
 ═══════════════════════════════════════════ */
 function handleSearch(query) {
   const q = query.toLowerCase().trim();
- 
+
   const main = document.getElementById('search-input');
   const nc   = document.getElementById('search-input-nc');
   if (main && main.value !== query) main.value = query;
   if (nc   && nc.value   !== query) nc.value   = query;
- 
+
   if (q === '') {
     buildNewCollection();
     buildBestSellers();
     return;
   }
- 
+
   const results = allProducts.filter(p =>
     p.name.toLowerCase().includes(q)
   );
- 
+
   showPage('new-collection');
- 
+
   if (results.length > 0) {
     renderProducts(results);
   } else {
@@ -169,13 +177,13 @@ function handleSearch(query) {
     `;
   }
 }
- 
+
 function clearSearch() {
   document.getElementById('search-input').value    = '';
   document.getElementById('search-input-nc').value = '';
   buildNewCollection();
 }
- 
+
 /* ═══════════════════════════════════════════
    Navigation
 ═══════════════════════════════════════════ */
@@ -192,22 +200,22 @@ function showPage(page) {
   document.getElementById(map[page]).style.display = 'block';
   window.scrollTo(0,0);
 }
- 
+
 /* ═══════════════════════════════════════════
    AUTH (معدّل يكلّم الباك إند)
 ═══════════════════════════════════════════ */
 let currentUser = null;
- 
+
 function openAuth()   { document.getElementById('auth-overlay').style.display = 'flex'; }
 function closeAuth()  { document.getElementById('auth-overlay').style.display = 'none'; }
- 
+
 function switchTab(tab) {
   document.getElementById('login-form').style.display  = tab === 'login'  ? 'block' : 'none';
   document.getElementById('signup-form').style.display = tab === 'signup' ? 'block' : 'none';
   document.getElementById('tab-login').classList.toggle('active',  tab === 'login');
   document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
 }
- 
+
 async function signup() {
   const name  = document.getElementById('signup-name').value.trim();
   const email = document.getElementById('signup-email').value.trim();
@@ -231,7 +239,7 @@ async function signup() {
     err.innerText = e.message || 'Registration failed';
   }
 }
- 
+
 async function login() {
   const email = document.getElementById('login-email').value.trim();
   const pass  = document.getElementById('login-pass').value;
@@ -253,26 +261,26 @@ async function login() {
     err.innerText = e.message || 'Wrong email or password.';
   }
 }
- 
+
 function loginUser(user) {
   currentUser = user;
   document.getElementById('nav-account-label').innerText = user.name.split(' ')[0];
   if (user.address) document.getElementById('customer-address').value = user.address;
   if (user.address) document.getElementById('saved-address').value = user.address;
 }
- 
+
 function logout() {
   currentUser = null;
   localStorage.removeItem('token');
   document.getElementById('nav-account-label').innerText = 'Login';
   showPage('main');
 }
- 
+
 function handleAccountClick() {
   if (currentUser) { loadAccountPage(); showPage('account'); }
   else { openAuth(); }
 }
- 
+
 async function loadAccountPage() {
   if (!currentUser) return;
   
@@ -298,7 +306,7 @@ async function loadAccountPage() {
     console.error('Failed to load account:', e);
   }
 }
- 
+
 async function saveAddress() {
   if (!currentUser) return;
   const addr = document.getElementById('saved-address').value.trim();
@@ -315,8 +323,7 @@ async function saveAddress() {
     alert('Failed to save address');
   }
 }
- 
-// Check if user is logged in on page load
+
 async function checkAuth() {
   const token = getToken();
   if (!token) return;
@@ -328,15 +335,14 @@ async function checkAuth() {
     localStorage.removeItem('token');
   }
 }
- 
-// Run on load
+
 checkAuth();
- 
+
 /* ═══════════════════════════════════════════
-   Cart (معدّل)
+   Cart
 ═══════════════════════════════════════════ */
 let cart = [];
- 
+
 function updateCart() {
   document.getElementById('cart-count').innerText    = cart.length;
   document.getElementById('cart-count-nc').innerText = cart.length;
@@ -360,14 +366,14 @@ function updateCart() {
   }).join('');
   document.getElementById('cart-total').innerText = total + ' EG';
 }
- 
+
 function addToCartSimple(name, price, img, e) {
   cart.push({ name, price, img, quantity: 1 });
   updateCart();
   e.currentTarget.style.opacity = '0.6';
   setTimeout(() => e.currentTarget.style.opacity = '1', 400);
 }
- 
+
 function addToCartDirect(imgId, name, price, btn) {
   const card        = document.getElementById(imgId).closest('.nc-card');
   const activeThumb = card.querySelector('.nc-thumb.active');
@@ -383,23 +389,23 @@ function addToCartDirect(imgId, name, price, btn) {
     btn.style.pointerEvents = 'auto';
   }, 1200);
 }
- 
+
 function removeFromCart(i) { cart.splice(i,1); updateCart(); }
 function openCart()  { document.getElementById('cart').style.display = 'flex'; }
 function closeCart() { document.getElementById('cart').style.display = 'none'; }
- 
+
 /* ═══════════════════════════════════════════
-   Checkout (كامل - معدّل)
+   Checkout
 ═══════════════════════════════════════════ */
 let selectedPayment = 'cash';
- 
+
 function selectPayment(method) {
   selectedPayment = method;
   document.getElementById('opt-whatsapp').classList.toggle('active', method === 'cash');
   document.getElementById('opt-visa').classList.toggle('active', method === 'visa');
   document.getElementById('visa-form').style.display = method === 'visa' ? 'block' : 'none';
 }
- 
+
 function goToCheckout() {
   if (cart.length === 0) {
     alert('Your cart is empty!');
@@ -429,11 +435,11 @@ function goToCheckout() {
   closeCart();
   showPage('checkout');
 }
- 
+
 function goBack() {
   showPage('main');
 }
- 
+
 async function submitOrder() {
   const name    = document.getElementById('customer-name').value.trim();
   const phone   = document.getElementById('customer-phone').value.trim();
@@ -484,7 +490,7 @@ async function submitOrder() {
     alert('Failed to place order: ' + (e.message || 'Unknown error'));
   }
 }
- 
+
 /* ═══════════════════════════════════════════
    Thumbnails
 ═══════════════════════════════════════════ */
@@ -496,7 +502,7 @@ function changeMainImg(productId, thumbEl) {
     .forEach(t => t.classList.remove('active'));
   thumbEl.classList.add('active');
 }
- 
+
 /* ═══════════════════════════════════════════
    Visa Format Helpers
 ═══════════════════════════════════════════ */
@@ -504,10 +510,9 @@ function formatCard(input) {
   let v = input.value.replace(/\D/g,'').substring(0,16);
   input.value = v.replace(/(.{4})/g,'$1 ').trim();
 }
- 
+
 function formatExpiry(input) {
   let v = input.value.replace(/\D/g,'').substring(0,4);
   if (v.length >= 2) v = v.substring(0,2) + ' / ' + v.substring(2);
   input.value = v;
 }
- 
